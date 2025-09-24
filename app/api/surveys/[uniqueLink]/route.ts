@@ -4,14 +4,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uniqueLink: string } }
+  context: { params: Promise<{ uniqueLink: string }> } //build time pe error 
 ) {
+  const { uniqueLink } = await context.params; 
+
   await dbConnect();
   try {
-    const survey = await SurveyModel.findOne({ uniqueLink: params.uniqueLink }).select('-owner');
+    const survey = await SurveyModel.findOne({ uniqueLink }).select('-owner');
 
     if (!survey) {
-      return NextResponse.json({ success: false, message: 'Survey not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: 'Survey not found' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
@@ -19,6 +24,9 @@ export async function GET(
       survey,
     });
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }

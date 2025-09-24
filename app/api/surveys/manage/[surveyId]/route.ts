@@ -6,12 +6,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { surveyId: string } }
+  context: { params: Promise<{ surveyId: string }> }
 ) {
+  const { surveyId } = await context.params;
+
   await dbConnect();
   try {
     const userId = getDataFromToken(request);
-    const { surveyId } = params;
 
     const survey = await SurveyModel.findById(surveyId);
 
@@ -21,22 +22,21 @@ export async function DELETE(
         { status: 404 }
       );
     }
-    
+
     if (survey.owner.toString() !== userId) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized action' },
         { status: 403 }
       );
     }
-    
-    await ResponseModel.deleteMany({ surveyId: surveyId });
+
+    await ResponseModel.deleteMany({ surveyId });
     await SurveyModel.findByIdAndDelete(surveyId);
 
     return NextResponse.json(
       { success: true, message: 'Survey and all its responses deleted successfully' },
       { status: 200 }
     );
-
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message },
