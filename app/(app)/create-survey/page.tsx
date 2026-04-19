@@ -15,6 +15,7 @@ interface Question {
 }
 
 export default function CreateSurveyPage() {
+  const [numQuestions, setNumQuestions]= useState(5);
   const [topic, setTopic] = useState('');
   const [title, setTitle] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -32,7 +33,7 @@ export default function CreateSurveyPage() {
       const response = await fetch('/api/generate-survey', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic }),
+        body: JSON.stringify({ topic,numQuestions }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -48,6 +49,8 @@ export default function CreateSurveyPage() {
       setIsGenerating(false);
     }
   };
+
+
 
   const handleQuestionChange = (index: number, value: string) => {
     const newQuestions = [...questions];
@@ -121,6 +124,11 @@ export default function CreateSurveyPage() {
                   placeholder="e.g., Customer satisfaction for a coffee shop"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
+                />
+                <Input
+                  id="numQuestions"
+                  value={numQuestions}
+                  onChange={(e) => setNumQuestions(e.target.value)}
                 />
               </div>
               <Button
