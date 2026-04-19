@@ -128,7 +128,7 @@ export default function CreateSurveyPage() {
                 <Input
                   id="numQuestions"
                   value={numQuestions}
-                  onChange={(e) => setNumQuestions(e.target.value)}
+                  onChange={(e) => setNumQuestions(Number(e.target.value))}
                 />
               </div>
               <Button
